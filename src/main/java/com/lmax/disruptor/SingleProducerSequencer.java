@@ -123,18 +123,24 @@ public final class SingleProducerSequencer extends SingleProducerSequencerFields
 
         long nextValue = this.nextValue;
 
+        //需要写入的下标位置
         long nextSequence = nextValue + n;
+        //注意这里减了了bufferSize,其实就是生产者最多可以比消费者快一个buffer的大小
         long wrapPoint = nextSequence - bufferSize;
+        //快速判断用,如果上次消费者下标还大于这个值,基本上都不用管继续生产即可
         long cachedGatingSequence = this.cachedValue;
 
         if (wrapPoint > cachedGatingSequence || cachedGatingSequence > nextValue)
         {
+            //这是因为其他地方的操作都是putOrder的方法,可能造成更新不及时,这里用这种强制刷新的方法来更新
             cursor.setVolatile(nextValue);  // StoreLoad fence
 
             long minSequence;
+            //注意这里说明了，生产者是没有等待策略的
             while (wrapPoint > (minSequence = Util.getMinimumSequence(gatingSequences, nextValue)))
             {
                 waitStrategy.signalAllWhenBlocking();
+                //挂起的方式
                 LockSupport.parkNanos(1L); // TODO: Use waitStrategy to spin?
             }
 
