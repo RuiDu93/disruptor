@@ -1,3 +1,8 @@
+## 这是对disruptor阅读的注释部分。基本上会覆盖一个先生产者和但消费者的全部内容。
+
+
+
+
 ## LMAX Disruptor
 
 A High Performance Inter-Thread Messaging Library
