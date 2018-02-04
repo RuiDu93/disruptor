@@ -107,6 +107,7 @@ public abstract class AbstractSequencer implements Sequencer
     @Override
     public SequenceBarrier newBarrier(Sequence... sequencesToTrack)
     {
+        //向消费者暴露生产者的生产进度,这里其实就是关健都cursor对象!
         return new ProcessingSequenceBarrier(this, waitStrategy, cursor, sequencesToTrack);
     }
 

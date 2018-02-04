@@ -118,6 +118,7 @@ public final class BatchEventProcessor<T>
         notifyStart();
 
         T event = null;
+        //获取希望消费的id
         long nextSequence = sequence.get() + 1L;
         try
         {
@@ -125,19 +126,22 @@ public final class BatchEventProcessor<T>
             {
                 try
                 {
+                    //由某种等待策略，看是否能获取这个序列的id！
+                    //这里只是拿到的最高可消费的id!!
                     final long availableSequence = sequenceBarrier.waitFor(nextSequence);
                     if (batchStartAware != null)
                     {
                         batchStartAware.onBatchStart(availableSequence - nextSequence + 1);
                     }
 
-                    while (nextSequence <= availableSequence)
-                    {
+                    //获取数据的方法!!
+                    while (nextSequence <= availableSequence) {
                         event = dataProvider.get(nextSequence);
+                        //回调的操作
                         eventHandler.onEvent(event, nextSequence, nextSequence == availableSequence);
                         nextSequence++;
                     }
-
+                    //commit的方法~
                     sequence.set(availableSequence);
                 }
                 catch (final TimeoutException e)

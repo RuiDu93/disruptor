@@ -53,6 +53,7 @@ final class ProcessingSequenceBarrier implements SequenceBarrier
     {
         checkAlert();
 
+        //通过等待策略获取可消费的id,核心就是通过各种锁的策略实现
         long availableSequence = waitStrategy.waitFor(sequence, cursorSequence, dependentSequence, this);
 
         if (availableSequence < sequence)
@@ -88,9 +89,11 @@ final class ProcessingSequenceBarrier implements SequenceBarrier
         alerted = false;
     }
 
+
     @Override
     public void checkAlert() throws AlertException
     {
+        //这里,alert的意思是这个流程已经被停止了,通过异常结束
         if (alerted)
         {
             throw AlertException.INSTANCE;

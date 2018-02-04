@@ -38,12 +38,23 @@ public final class BlockingWaitStrategy implements WaitStrategy
         long availableSequence;
         if (cursorSequence.get() < sequence)
         {
+
+
+            /*
+            注意这个写法其实就是
+            synchronized (this){
+                ....
+                wait();
+            }
+            这里需要注意的是,仅仅是对于生产者信号做了一个等待!
+             */
             lock.lock();
             try
             {
                 while (cursorSequence.get() < sequence)
                 {
                     barrier.checkAlert();
+                    //让出cpu的策略！
                     processorNotifyCondition.await();
                 }
             }
@@ -65,6 +76,7 @@ public final class BlockingWaitStrategy implements WaitStrategy
     @Override
     public void signalAllWhenBlocking()
     {
+        //这个就是生产者生产完调用一波的!
         lock.lock();
         try
         {

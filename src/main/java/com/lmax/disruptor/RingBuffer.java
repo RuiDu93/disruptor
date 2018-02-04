@@ -35,6 +35,7 @@ abstract class RingBufferFields<E> extends RingBufferPad
 
     static
     {
+        //查看一个类有多大~
         final int scale = UNSAFE.arrayIndexScale(Object[].class);
         if (4 == scale)
         {
@@ -62,6 +63,7 @@ abstract class RingBufferFields<E> extends RingBufferPad
         EventFactory<E> eventFactory,
         Sequencer sequencer)
     {
+        //代理的生产者类！
         this.sequencer = sequencer;
         this.bufferSize = sequencer.getBufferSize();
 
@@ -75,6 +77,7 @@ abstract class RingBufferFields<E> extends RingBufferPad
         }
 
         this.indexMask = bufferSize - 1;
+        //注意这里这个环的填充方式!
         this.entries = new Object[sequencer.getBufferSize() + 2 * BUFFER_PAD];
         fill(eventFactory);
     }

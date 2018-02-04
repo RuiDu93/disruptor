@@ -79,6 +79,9 @@ public final class SleepingWaitStrategy implements WaitStrategy
         }
         else
         {
+            //注意LockSupport.parkNanos这个方法的核心是"挂起"而不是“休眠”
+            //所以对于Thread.sleep来说,是可以被unpark的()
+            //对于Object.wati()方法来说,不在锁中操作~
             LockSupport.parkNanos(1L);
         }
 
